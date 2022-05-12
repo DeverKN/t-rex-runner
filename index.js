@@ -11,7 +11,18 @@ const repeat = (func, repeatTimes) => {
 
 class PseudoRandom {
     constructor(seed = null) {
-        this.random = ((seed !== null) ? new Math.seedrandom(seed) : Math.random);
+        this.seed = seed
+        // const privateRand = ((seed !== null) ? new Math.seedrandom(seed) : Math.random);
+        this.reset = () => {
+            //Reset the RNG state
+            this._privateRand = ((this.seed !== null) ? new Math.seedrandom(this.seed) : Math.random);
+        }
+        this.reset()
+        this.random = () => {
+            // console.log(this._privateRand)
+            const randResult = this._privateRand()
+            return randResult
+        }
     }
 }
 
@@ -40,6 +51,7 @@ class ControllerBuilder {
     }
 
     start(callback = null) {
+        console.log("start")
         this.dinogame.playIntro()
     }
 
@@ -541,7 +553,9 @@ class ObserverBuilder {
          * Canvas container width expands out to the full width.
          */
         playIntro: function () {
+            //Rest the RNG seed
             if (!this.activated && !this.crashed) {
+                SeededRandom.reset()
                 this.playingIntro = true;
                 this.tRex.playingIntro = true;
 
@@ -623,7 +637,9 @@ class ObserverBuilder {
                 var hasObstacles = this.runningTime > this.config.CLEAR_TIME;
 
                 // First jump triggers the intro.
+                // console.log(this.tRex.jumpCount)
                 if (this.tRex.jumpCount == 1 && !this.playingIntro) {
+                    // console.log("first jump")
                     this.playIntro();
                 }
 
@@ -1086,7 +1102,9 @@ class ObserverBuilder {
      * @param {number}
      */
     function getRandomNum(min, max) {
-        return Math.floor(SeededRandom.random() * (max - min + 1)) + min;
+        const randNum = Math.floor(SeededRandom.random() * (max - min + 1)) + min;
+        // console.log(`Rand Num: ${randNum}`)
+        return randNum
     }
 
 
@@ -2864,12 +2882,15 @@ class ObserverBuilder {
 
 
 function onDocumentLoad() {
-    // (Potentially) seeded random number gererator
-    window.SeededRandom = new PseudoRandom(12345)
+    // window.SeededRandom = new PseudoRandom(12345)
 
     const url = new URL(window.location.href);
     let frameByFrame = url.searchParams.get("frameByFrame") ?? 'false';
     frameByFrame = frameByFrame == 'true'
+
+    let seed = url.searchParams.get("seed") ?? null
+    // (Potentially) seeded random number gererator
+    window.SeededRandom = new PseudoRandom(seed)
 
     runner = new Runner('.interstitial-wrapper');
     runner.config.FRAME_BY_FRAME_MODE = frameByFrame
