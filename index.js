@@ -156,6 +156,9 @@ class ObserverBuilder {
         // Callback to be called after the next tick is complete
         this.nextTickCallback = null
 
+        this.effectiveFPS = 0
+        this.lastSecond = 0
+
         if (this.isDisabled()) {
             this.setupDisabledRunner();
         } else {
@@ -614,6 +617,18 @@ class ObserverBuilder {
                 this.dimensions.HEIGHT);
         },
 
+        newFrame: function (deltaTime) {
+            const currTime = Date.now()
+            if (currTime - this.lastSecond >= 1000) {
+                const fpsDiv = document.querySelector("#fps-meter")
+                fpsDiv.textContent = `Effective FPS: ${this.effectiveFPS}`
+                this.effectiveFPS = 0
+                this.lastSecond = currTime
+            }
+            const secondsPerFrame = 1000/FPS
+            this.effectiveFPS += deltaTime/secondsPerFrame
+        },
+
         /**
          * Update the game frame and schedules the next one.
          */
@@ -624,6 +639,7 @@ class ObserverBuilder {
 
             const secondsPerFrame = 1000/FPS
             var deltaTime = this.config.FRAME_BY_FRAME_MODE ? secondsPerFrame : (now - (this.time || now));
+            this.newFrame(deltaTime)
             this.time = now;
 
             if (this.playing) {
