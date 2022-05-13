@@ -40,7 +40,11 @@ class ControllerBuilder {
         this.actions = {
             jump: (callback = null) => this.dinogame.doJump(callback),
             duck: (callback = null) => this.dinogame.doDuck(callback),
-            forward: (callback = null) => this.dinogame.doForward(callback)
+            forward: (callback = null) => this.dinogame.doForward(callback),
+            recursiveJump: (callback = null) => {
+                this.actions.jump()
+                setTimeout(this.actions.recursiveJump, 0)
+            }
         }
 
         this.config = this.dinogame.config
@@ -632,13 +636,16 @@ class ObserverBuilder {
         /**
          * Update the game frame and schedules the next one.
          */
-        update: function () {
+        update: function (forcedUpdate = false) {
             this.updatePending = false;
 
             var now = getTimeStamp();
-
-            const secondsPerFrame = 1000/FPS
-            var deltaTime = this.config.FRAME_BY_FRAME_MODE ? secondsPerFrame : (now - (this.time || now));
+            if (forcedUpdate) {
+                var deltaTime = 1000 / FPS
+            } else {
+                var deltaTime = (now - (this.time || now))
+            }
+            //this.config.FRAME_BY_FRAME_MODE ? secondsPerFrame : (now - (this.time || now));
             this.newFrame(deltaTime)
             this.time = now;
 
@@ -716,7 +723,6 @@ class ObserverBuilder {
                 this.tRex.blinkCount < Runner.config.MAX_BLINK_COUNT)) {
                 this.tRex.update(deltaTime);
                 if (!this.config.FRAME_BY_FRAME_MODE) this.scheduleNextUpdate()
-
                 this.runNextTickCallback()
             }
         },
@@ -941,7 +947,12 @@ class ObserverBuilder {
             if (!this.updatePending) {
                 this.updatePending = true;
                 const callback = this.config.FRAME_BY_FRAME_MODE ? (...args) => repeat(() => this.update.call(this, args), this.config.FRAMES_PER_MOVE) : this.update.bind(this)
-                this.raqId = requestAnimationFrame(callback);
+                if (this.config.FRAME_BY_FRAME_MODE) {
+                    // const secondsPerFrame = 1000/FPS
+                    callback(true)
+                } else {
+                    this.raqId = requestAnimationFrame(callback);
+                }
             }
         },
 
