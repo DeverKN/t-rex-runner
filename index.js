@@ -241,7 +241,7 @@ class ObserverBuilder {
         // If this is true then the game will update everytime a move is made, instead of on atime
         FRAME_BY_FRAME_MODE: true,
         FRAMES_PER_MOVE: 1,
-        PAUSE_ON_FOCUS_CHANGE: false
+        PAUSE_ON_FOCUS_CHANGE: true
     };
 
 
