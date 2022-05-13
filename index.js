@@ -240,7 +240,8 @@ class ObserverBuilder {
         SPEED_DROP_COEFFICIENT: 3,
         // If this is true then the game will update everytime a move is made, instead of on atime
         FRAME_BY_FRAME_MODE: true,
-        FRAMES_PER_MOVE: 1
+        FRAMES_PER_MOVE: 1,
+        PAUSE_ON_FOCUS_CHANGE: false
     };
 
 
@@ -1053,6 +1054,7 @@ class ObserverBuilder {
          * Pause the game if the tab is not in focus.
          */
         onVisibilityChange: function (e) {
+            if (!this.config.PAUSE_ON_FOCUS_CHANGE) return
             if (document.hidden || document.webkitHidden || e.type == 'blur' ||
                 document.visibilityState != 'visible') {
                 this.stop();
