@@ -656,7 +656,7 @@ class ObserverBuilder {
             this.updatePending = false;
 
             var now = getTimeStamp();
-            if (forcedUpdate) {
+            if (forcedUpdate === true) {
                 var deltaTime = 1000 / FPS
             } else {
                 var deltaTime = (now - (this.time || now))
@@ -962,7 +962,7 @@ class ObserverBuilder {
         scheduleNextUpdate: function () {
             if (!this.updatePending) {
                 this.updatePending = true;
-                const callback = this.config.FRAME_BY_FRAME_MODE ? (...args) => repeat(() => this.update.call(this, args), this.config.FRAMES_PER_MOVE) : this.update.bind(this)
+                const callback = this.update.bind(this)//this.config.FRAME_BY_FRAME_MODE ? (...args) => repeat(() => this.update.call(this, args), this.config.FRAMES_PER_MOVE) : this.update.bind(this)
                 if (this.config.FRAME_BY_FRAME_MODE) {
                     // const secondsPerFrame = 1000/FPS
                     callback(true)
@@ -1057,6 +1057,8 @@ class ObserverBuilder {
                 document.visibilityState != 'visible') {
                 this.stop();
             } else if (!this.crashed) {
+                console.log("test")
+                this.time = getTimeStamp();
                 this.tRex.reset();
                 this.play();
             }
