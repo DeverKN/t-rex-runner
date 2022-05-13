@@ -47,6 +47,22 @@ class ControllerBuilder {
             }
         }
 
+        this.setGenerationInfo = (generationNum, lastGenerationTimeTaken, lastGenerationScore, lastTenScore) => {
+            const genNumDiv = document.querySelector('#generation-num');
+            genNumDiv.textContent = `Generation #: ${generationNum}`
+            const lastGenTimeDiv = document.querySelector('#last-gen-time');
+            lastGenTimeDiv.textContent = `Last Gen Training Time: ${lastGenerationTimeTaken}s`
+            const lastGenScoreDiv = document.querySelector('#last-gen-score');
+            lastGenScoreDiv.textContent = `Last Gen Score: ${lastGenerationScore}`
+            const lastTenScoreDiv = document.querySelector('#last-ten-score');
+            lastTenScoreDiv.textContent = `Average Score of Last Ten Gens: ${lastTenScore}`
+        }
+
+        this.setCustomInfo = (customInfo) => {
+            const customInfoDiv = document.querySelector('#custom-info');
+            customInfoDiv.textContent = customInfo
+        }
+
         this.config = this.dinogame.config
     }
 
@@ -625,7 +641,7 @@ class ObserverBuilder {
             const currTime = Date.now()
             if (currTime - this.lastSecond >= 1000) {
                 const fpsDiv = document.querySelector("#fps-meter")
-                fpsDiv.textContent = `Effective FPS: ${this.effectiveFPS}`
+                fpsDiv.textContent = `Effective FPS: ${Math.round(this.effectiveFPS)}`
                 this.effectiveFPS = 0
                 this.lastSecond = currTime
             }
